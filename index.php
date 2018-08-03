@@ -36,6 +36,25 @@ mysqli_set_charset($cnnMySQL, "utf8");
               }
           });
       }
+
+      function IsimlerdeAra() {
+        $.ajax({
+            type: 'GET',
+            url: 'isim.listele.php',
+            data: { aranan: $("#Aranan").val() },
+            dataType: 'html',
+            success: function (ajaxCevap) {
+              if(ajaxCevap != "") {
+                $("#ISIM_LISTELE").hide();
+                $("#ARAMA_SONUCU_LISTELE").show();
+                $("#SonucAlani").html(ajaxCevap);
+              } else {
+                $("#ISIM_LISTELE").show();
+                $("#ARAMA_SONUCU_LISTELE").hide();
+              }
+            }
+        });
+      }
     </script>
 
   </head>
@@ -61,7 +80,7 @@ mysqli_set_charset($cnnMySQL, "utf8");
             </li>
           </ul>
           <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="İsim ara..." aria-label="Search">
+            <input id='Aranan' onkeyup='IsimlerdeAra()' class="form-control mr-sm-2" type="search" placeholder="İsim ara..." aria-label="Search">
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">BUL</button>
           </form>
         </div>
@@ -104,7 +123,7 @@ mysqli_set_charset($cnnMySQL, "utf8");
      <!-- O Harf İle Başlayan İsimleri Listele -->
      <!-- O Harf İle Başlayan İsimleri Listele -->
      <!-- O Harf İle Başlayan İsimleri Listele -->
-     <div class="container">
+     <div class="container" id='ISIM_LISTELE'>
        <div class="row mt-5">
          <?php
            $ArananHarf=$_GET["harf"];
@@ -116,21 +135,12 @@ mysqli_set_charset($cnnMySQL, "utf8");
              extract($row);
              $isim = str_replace("'", "`", $isim);
              $anlam = str_replace("'", "`", $anlam);
-             /*
-             echo "
-                  <div class='col-md-2 mb-2'>
-                    <a class='btn btn-success btn-block' href='#' onclick='Goster(\"$isim\", \"$anlam\")'>$isim</a>
-                  </div>
-                  ";
-            */
 
-              echo "
+            echo "
                    <div class='col-md-2 mb-2'>
                      <a class='btn btn-success btn-block' href='#' onclick='AnlamGetir($id)'>$isim</a>
                    </div>
                    ";
-
-
 
             } // while
           ?>
@@ -141,6 +151,20 @@ mysqli_set_charset($cnnMySQL, "utf8");
       <!-- /O Harf İle Başlayan İsimleri Listele -->
 
 
+      <div class="container" id='ARAMA_SONUCU_LISTELE' style="display:none;">
+        <div class="row mt-5"  id='SonucAlani'>
+        </div>
+      </div>
+
+
+      <p>&nbsp;</p>
+      <p>&nbsp;</p>
+      <p>&nbsp;</p>
+      <p>&nbsp;</p>
+      <p>&nbsp;</p>
+      <p>&nbsp;</p>
+      <p>&nbsp;</p>
+      <p>&nbsp;</p>
 
 
     <!-- Optional JavaScript -->
