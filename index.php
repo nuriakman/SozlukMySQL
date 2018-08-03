@@ -14,13 +14,30 @@ mysqli_set_charset($cnnMySQL, "utf8");
 <html lang="tr">
   <head>
     <!-- Required meta tags -->
+    <title>İsimler Sözlüğü!</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
 
-    <title>İsimler Sözlüğü!</title>
+    <!-- SweetAlert -->
+    <script src="bootstrap/js/sweetalert.min.js"></script>
+
+    <script>
+      function AnlamGetir(id) {
+          $.ajax({
+              type: 'GET',
+              url: 'isim.bilgi.php',
+              data: { id: id },
+              dataType: 'json',
+              success: function (ajaxCevap) {
+                swal(ajaxCevap.isim, ajaxCevap.anlam, "success"  );
+              }
+          });
+      }
+    </script>
+
   </head>
   <body>
 
@@ -70,7 +87,7 @@ mysqli_set_charset($cnnMySQL, "utf8");
               $OrtaNokta = round($RowCount / 2);
               while($row = mysqli_fetch_assoc($rows)){
                 extract($row);
-                echo "<a class='btn btn-primary btn-lg mb-2 mr-1' href='index.php?harf=$HARF'>$HARF</a>";
+                echo "<a class='btn btn-primary btn-lg mb-2 mr-1' href='index.php?harf=$HARF'>$HARF</a>\n";
                 $c++;
                 if( $c == $OrtaNokta ) echo "<br><br>";
               } // while
@@ -91,17 +108,30 @@ mysqli_set_charset($cnnMySQL, "utf8");
        <div class="row mt-5">
          <?php
            $ArananHarf=$_GET["harf"];
-           $SQL = "SELECT id, isim FROM sozluk WHERE substr(isim, 1, 1) = '$ArananHarf' ORDER BY isim";
+           $SQL = "SELECT id, isim, anlam FROM sozluk WHERE substr(isim, 1, 1) = '$ArananHarf' ORDER BY isim";
            $rows     = mysqli_query($cnnMySQL, $SQL); // SORGUYU ÇALIŞTIR ve SONUCUNU GETİR
            $RowCount = mysqli_num_rows($rows); // Cevabın kaç satırı olduğunu öğren
 
            while($row = mysqli_fetch_assoc($rows)){
              extract($row);
+             $isim = str_replace("'", "`", $isim);
+             $anlam = str_replace("'", "`", $anlam);
+             /*
              echo "
                   <div class='col-md-2 mb-2'>
-                    <a class='btn btn-success btn-block' href='index.php?isimID=$id'>$isim</a>
+                    <a class='btn btn-success btn-block' href='#' onclick='Goster(\"$isim\", \"$anlam\")'>$isim</a>
                   </div>
                   ";
+            */
+
+              echo "
+                   <div class='col-md-2 mb-2'>
+                     <a class='btn btn-success btn-block' href='#' onclick='AnlamGetir($id)'>$isim</a>
+                   </div>
+                   ";
+
+
+
             } // while
           ?>
         </div>
@@ -118,5 +148,6 @@ mysqli_set_charset($cnnMySQL, "utf8");
     <script src="bootstrap/js/jquery-3.3.1.slim.min.js"></script>
     <script src="bootstrap/js/popper.min.js"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="bootstrap/js/jquery.min.js"></script>
   </body>
 </html>
