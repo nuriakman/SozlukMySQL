@@ -1,19 +1,18 @@
 <?php
-## Veritabanına bağlantı kuralım...
-## Veritabanına bağlantı kuralım...
-$host     = "localhost";
-$user     = "root";
-$password = "1234";
-$database = "sairler_db";
-$cnnMySQL = mysqli_connect( $host, $user, $password, $database );
-if( mysqli_connect_error() ) die("Veritabanına bağlanılamadı...");
-mysqli_set_charset($cnnMySQL, "utf8");
+  require("inc_config.php");
 
-$id = $_GET["id"];
-$SQL      = "SELECT id, isim, anlam FROM sozluk WHERE id = '$id' ";
-$rows     = mysqli_query($cnnMySQL, $SQL); // SORGUYU ÇALIŞTIR ve SONUCUNU GETİR
-$row      = mysqli_fetch_assoc($rows); // SADECE 1 SATIR GETİR!!!
+  $id = $_GET["id"];
+  $SQL      = "SELECT id, isim, anlam FROM sozluk WHERE id = '$id' ";
+  $rows     = mysqli_query($cnnMySQL, $SQL); // SORGUYU ÇALIŞTIR ve SONUCUNU GETİR
+  $row      = mysqli_fetch_assoc($rows); // SADECE 1 SATIR GETİR!!!
+  extract($row);
 
-echo json_encode($row);
+  $ICON = "img/uniseks.png";
+  if( strpos($anlam, "Er.") > 0 ) $ICON = "img/erkek.gif";
+  if( strpos($anlam, "Ka.") > 0 ) $ICON = "img/kiz.gif";
+
+  $row["icon"] = $ICON;
+  $row["renk"] = "kırmızı";
+  echo json_encode($row);
 
 ?>

@@ -1,14 +1,5 @@
 <?php
-## Veritabanına bağlantı kuralım...
-## Veritabanına bağlantı kuralım...
-$host     = "localhost";
-$user     = "root";
-$password = "1234";
-$database = "sairler_db";
-$cnnMySQL = mysqli_connect( $host, $user, $password, $database );
-if( mysqli_connect_error() ) die("Veritabanına bağlanılamadı...");
-mysqli_set_charset($cnnMySQL, "utf8");
-
+  require("inc_config.php");
 ?>
 <!doctype html>
 <html lang="tr">
@@ -32,7 +23,13 @@ mysqli_set_charset($cnnMySQL, "utf8");
               data: { id: id },
               dataType: 'json',
               success: function (ajaxCevap) {
-                swal(ajaxCevap.isim, ajaxCevap.anlam, "success"  );
+              //  swal(ajaxCevap.isim, ajaxCevap.anlam, "success"  );
+                swal({
+                  title: ajaxCevap.isim,
+                  text: ajaxCevap.anlam,
+                  icon: ajaxCevap.icon,
+                  button: "Tamam",
+                });
               }
           });
       }
@@ -76,7 +73,7 @@ mysqli_set_charset($cnnMySQL, "utf8");
               <a class="nav-link" href="index.php">Ana Sayfa <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="hakkinda.php">Hakkında...</a>
+              <a class="nav-link" href="hakkinda.php" data-toggle="modal" data-target="#exampleModal">Hakkında...</a>
             </li>
           </ul>
           <form class="form-inline my-2 my-lg-0">
@@ -96,7 +93,7 @@ mysqli_set_charset($cnnMySQL, "utf8");
      <!-- Harfleri Listele -->
      <div class="container">
        <div class="row mt-5">
-          <div class="col-md-12">
+          <div class="col-md-12 text-center">
             <?php
               $SQL = "SELECT DISTINCT SUBSTR(isim, 1, 1) as HARF FROM sozluk ORDER BY HARF";
               $rows     = mysqli_query($cnnMySQL, $SQL); // SORGUYU ÇALIŞTIR ve SONUCUNU GETİR
@@ -106,7 +103,7 @@ mysqli_set_charset($cnnMySQL, "utf8");
               $OrtaNokta = round($RowCount / 2);
               while($row = mysqli_fetch_assoc($rows)){
                 extract($row);
-                echo "<a class='btn btn-primary btn-lg mb-2 mr-1' href='index.php?harf=$HARF'>$HARF</a>\n";
+                echo "<a class='btn btn-outline-danger btn-lg mb-2 mr-1' style='width:50px;' href='index.php?harf=$HARF'>$HARF</a>\n";
                 $c++;
                 if( $c == $OrtaNokta ) echo "<br><br>";
               } // while
@@ -127,21 +124,19 @@ mysqli_set_charset($cnnMySQL, "utf8");
        <div class="row mt-5">
          <?php
            $ArananHarf=$_GET["harf"];
-           $SQL = "SELECT id, isim, anlam FROM sozluk WHERE substr(isim, 1, 1) = '$ArananHarf' ORDER BY isim";
+           // $SQL = "SELECT id, isim, anlam FROM sozluk WHERE substr(isim, 1, 1) = '$ArananHarf' ORDER BY isim";
+           $SQL = "SELECT id, isim, anlam FROM sozluk WHERE isim LIKE '$ArananHarf%' ORDER BY isim";
            $rows     = mysqli_query($cnnMySQL, $SQL); // SORGUYU ÇALIŞTIR ve SONUCUNU GETİR
            $RowCount = mysqli_num_rows($rows); // Cevabın kaç satırı olduğunu öğren
 
            while($row = mysqli_fetch_assoc($rows)){
              extract($row);
-             $isim = str_replace("'", "`", $isim);
-             $anlam = str_replace("'", "`", $anlam);
-
-            echo "
-                   <div class='col-md-2 mb-2'>
-                     <a class='btn btn-success btn-block' href='#' onclick='AnlamGetir($id)'>$isim</a>
-                   </div>
-                   ";
-
+             $Cinsiyet = "warning";
+             if( strpos($anlam, " Er.") > 0 ) $Cinsiyet = "success";
+             if( strpos($anlam, " Ka.") > 0 ) $Cinsiyet = "info";
+             echo "<div class='col-md-2 mb-2'>
+                     <button class='btn btn-$Cinsiyet btn-block' href='#' onclick='AnlamGetir($id)'>$isim</button>
+                   </div> ";
             } // while
           ?>
         </div>
@@ -156,6 +151,33 @@ mysqli_set_charset($cnnMySQL, "utf8");
         </div>
       </div>
 
+
+
+
+        <!-- Modal -->
+        <!-- Modal -->
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Hakkında</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              </div>
+              <div class="modal-body">
+                2018 Linux Yaz Kampı Php ile Web Programlama dersi sırasında örnek proje olarak yapılmıştır.
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal">Kapat</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /MODAL -->
+        <!-- /MODAL -->
+        <!-- /MODAL -->
 
       <p>&nbsp;</p>
       <p>&nbsp;</p>
